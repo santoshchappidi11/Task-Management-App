@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import Navbar from "./Components/Navbar/Navbar";
+import TaskNavbar from "./Components/Navbar/Navbar.js";
 import Home from "./Components/Home/Home";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Register/Register";
@@ -12,8 +12,7 @@ import EditTask from "./Components/Task/EditTask";
 function App() {
   return (
     <div className="App">
-      TODO
-      <Navbar />
+      <TaskNavbar />
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/login" element={<Login />} />
