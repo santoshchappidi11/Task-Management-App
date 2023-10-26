@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken";
 
 export const Register = async (req, res) => {
   try {
-    const { name, email, number, password } = req.body;
-    if (!name || !email || !password || !number)
+    const { name, email, password } = req.body.userData;
+    if (!name || !email || !password)
       return res
         .status(404)
         .json({ success: false, message: "All fields are required!" });
@@ -23,7 +23,6 @@ export const Register = async (req, res) => {
     const user = new UserModel({
       name,
       email,
-      number,
       password: hashedPassword,
     });
     await user.save();
@@ -38,7 +37,7 @@ export const Register = async (req, res) => {
 
 export const Login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body.userData;
     if (!email || !password)
       return res
         .status(404)
@@ -64,7 +63,6 @@ export const Login = async (req, res) => {
         userId: user._id,
         name: user.name,
         email: user.email,
-        number: user.number,
       };
 
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
@@ -112,7 +110,6 @@ export const getCurrentUser = async (req, res) => {
       userId: user?._id,
       name: user?.name,
       email: user?.email,
-      number: user?.number,
     };
 
     return res.status(200).json({ success: true, user: userObj });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -8,9 +8,11 @@ import {
   Button,
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
+import { AuthContexts } from "../../Context/AuthContext";
 
 const TaskNavbar = () => {
   const navigateTo = useNavigate();
+  const { state, Logout } = useContext(AuthContexts);
 
   return (
     <Navbar shouldHideOnScroll className="h-20 w-screen border">
@@ -47,21 +49,35 @@ const TaskNavbar = () => {
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
+        {state?.currentUser?.name && (
+          <NavbarItem>Welcome, ({state?.currentUser?.name})</NavbarItem>
+        )}
         <NavbarItem className="hidden lg:flex">
-          <Link onClick={() => navigateTo("/login")} className="cursor-pointer">
-            Login
-          </Link>
+          {!state?.currentUser?.name ? (
+            <Link
+              onClick={() => navigateTo("/login")}
+              className="cursor-pointer"
+            >
+              Login
+            </Link>
+          ) : (
+            <Link onClick={Logout} className="cursor-pointer">
+              Logout
+            </Link>
+          )}
         </NavbarItem>
-        <NavbarItem>
-          <Button
-            color="primary"
-            variant="flat"
-            onClick={() => navigateTo("/register")}
-            className="cursor-pointer"
-          >
-            Sign Up
-          </Button>
-        </NavbarItem>
+        {!state?.currentUser?.name && (
+          <NavbarItem>
+            <Button
+              color="primary"
+              variant="flat"
+              onClick={() => navigateTo("/register")}
+              className="cursor-pointer"
+            >
+              Sign Up
+            </Button>
+          </NavbarItem>
+        )}
       </NavbarContent>
     </Navbar>
   );

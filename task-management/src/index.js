@@ -6,40 +6,43 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { NextUIProvider } from "@nextui-org/react";
+import AuthProvider from "./Context/AuthContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        gutter={8}
-        containerClassName=""
-        containerStyle={{}}
-        toastOptions={{
-          // Define default options
-          className: "",
-          duration: 5000,
-          style: {
-            background: "#363636",
-            color: "#fff",
-          },
-
-          // Default options for specific types
-          success: {
-            duration: 3000,
-            theme: {
-              primary: "green",
-              secondary: "black",
+    <AuthProvider>
+      <BrowserRouter>
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          gutter={8}
+          containerClassName=""
+          containerStyle={{}}
+          toastOptions={{
+            // Define default options
+            className: "",
+            duration: 5000,
+            style: {
+              background: "#363636",
+              color: "#fff",
             },
-          },
-        }}
-      />
-      <NextUIProvider>
-        <App />
-      </NextUIProvider>
-    </BrowserRouter>
+
+            // Default options for specific types
+            success: {
+              duration: 3000,
+              theme: {
+                primary: "green",
+                secondary: "black",
+              },
+            },
+          }}
+        />
+        <NextUIProvider>
+          <App />
+        </NextUIProvider>
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>
 );
 

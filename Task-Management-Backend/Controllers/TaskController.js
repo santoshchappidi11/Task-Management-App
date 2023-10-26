@@ -55,9 +55,11 @@ export const addTaskTitle = async (req, res) => {
       });
       await task.save();
 
+      const tasks = await TaskModel.find({ userId });
+
       return res
         .status(201)
-        .json({ success: true, message: "New Task Created!" });
+        .json({ success: true, message: "New Todo Added!", tasks });
     }
 
     return res.status(404).json({ success: false, message: "No User Found!" });
@@ -119,18 +121,27 @@ export const updateTask = async (req, res) => {
 
 export const getEditTask = async (req, res) => {
   try {
-    const { taskId } = req.body;
+    const { token, taskId } = req.body;
 
     if (!taskId)
       return res
         .status(404)
         .json({ success: false, message: "Task Id is required!" });
 
-    const task = await TaskModel.findById(taskId);
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decodedData)
+      return res
+        .status(404)
+        .json({ success: false, message: "Token not valid!" });
+
+    const userId = decodedData.userId;
+
+    const task = await TaskModel.findOne({ _id: taskId, userId });
+    console.log(task);
 
     if (task) {
-      await task.save();
-      return res.status(200).json({ success: true, task });
+      return res.status(200).json({ success: true, task: task });
     }
 
     return res
