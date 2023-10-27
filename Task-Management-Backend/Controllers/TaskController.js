@@ -70,16 +70,9 @@ export const addTaskTitle = async (req, res) => {
 
 export const updateTask = async (req, res) => {
   try {
-    const {
-      taskId,
-      token,
-      title,
-      description,
-      dueDate,
-      priority,
-      status,
-      labels,
-    } = req.body;
+    const { taskId, token } = req.body;
+    const { title, description, dueDate, priority, status } =
+      req.body.taskDetails;
 
     if (!taskId)
       return res
@@ -102,13 +95,16 @@ export const updateTask = async (req, res) => {
 
     const task = await TaskModel.findOneAndUpdate(
       { _id: taskId, userId: userId },
-      { title, description, dueDate, priority, status, labels },
+      { title, description, dueDate, priority, status },
       { new: true }
     );
 
     if (task) {
       await task.save();
-      return res.status(200).json({ success: true, message: "Task Updated!" });
+      const tasks = await TaskModel.find({ userId });
+      return res
+        .status(200)
+        .json({ success: true, tasks, message: "Task Updated!" });
     }
 
     return res
@@ -140,13 +136,12 @@ export const getEditTask = async (req, res) => {
     const task = await TaskModel.findOne({ _id: taskId, userId });
     console.log(task);
 
-    if (task) {
-      return res.status(200).json({ success: true, task: task });
+    if (!task) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Can't get your task!" });
     }
-
-    return res
-      .status(404)
-      .json({ success: false, message: "Can't get your task!" });
+    return res.status(200).json({ success: true, message: "Your task title!" });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }
@@ -181,9 +176,10 @@ export const deleteTask = async (req, res) => {
       if (user) {
         user?.deletedTasks?.push(deletedTask);
         await user.save();
+        const tasks = await TaskModel.find({ userId });
         return res
           .status(200)
-          .json({ success: true, message: "Task Deleted!" });
+          .json({ success: true, tasks, message: "Task Deleted!" });
       }
 
       return res

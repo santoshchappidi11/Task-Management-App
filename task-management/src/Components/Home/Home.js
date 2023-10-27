@@ -97,23 +97,63 @@ const Home = () => {
       try {
         const response = api.post("/get-edit-task", { token, taskId });
         if (response.data.success) {
-          setTaskDetails(response.data.task);
+          // console.log(response?.data?.task, "task here");
+          setTaskDetails(response?.data?.task);
+          // toast.success(response?.data?.message);
         } else {
-          toast.error(response.data.message);
+          toast.error(response?.data?.message);
         }
       } catch (error) {
-        toast.error(error.response.data.message);
+        console.log(error.response.data.message);
       }
     }
   };
 
   const handleOpen = (taskId) => {
     onOpen();
-    getEditTask(taskId);
+    if (taskId) {
+      getEditTask(taskId);
+    }
   };
 
-  const handleUpdateTaskSubmit = (e) => {
+  const handleUpdateTaskSubmit = async (e, taskId) => {
     e.preventDefault();
+
+    const token = JSON.parse(localStorage.getItem("Token"));
+
+    if (token) {
+      try {
+        const response = await api.post("/update-task", {
+          taskId,
+          token,
+          taskDetails,
+        });
+
+        if (response.data.success) {
+          setAllTasks(response.data.tasks);
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    const token = JSON.parse(localStorage.getItem("Token"));
+
+    if (token) {
+      const response = await api.post("/delete-task", { token, taskId });
+
+      if (response.data.success) {
+        setAllTasks(response.data.tasks);
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+    }
   };
 
   return (
@@ -162,12 +202,9 @@ const Home = () => {
                 <TableCell>5th Jun 2023</TableCell>
                 <TableCell className="flex items-center justify-evenly">
                   <div onClick={() => handleOpen(task._id)}>
-                    <i
-                      className="fa-solid fa-pen-to-square fa-xl cursor-pointer"
-                      onClick={() => getEditTask(task._id)}
-                    ></i>
+                    <i className="fa-solid fa-pen-to-square fa-xl cursor-pointer"></i>
                   </div>
-                  <div>
+                  <div onClick={() => deleteTask(task._id)}>
                     <i className="fa-solid fa-trash fa-xl cursor-pointer"></i>
                   </div>
                 </TableCell>
