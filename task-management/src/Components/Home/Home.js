@@ -29,14 +29,17 @@ const Home = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [title, setTitle] = useState();
   const [allTasks, setAllTasks] = useState([]);
-  // const [getTask, setGetTask] = useState({});
+  const [updateTaskId, setUpdateTaskId] = useState("");
   const [taskDetails, setTaskDetails] = useState({
+    _id: "",
     title: "",
     description: "",
     dueDate: "",
     status: "",
     priority: "",
   });
+
+  console.log(updateTaskId, " update task id here");
 
   const handleInputValue = (e) => {
     setTitle(e.target.value);
@@ -77,7 +80,7 @@ const Home = () => {
         try {
           const response = await api.post("/get-your-tasks", { token });
           if (response.data.success) {
-            setAllTasks(response.data.tasks);
+            setAllTasks(response?.data?.tasks);
           } else {
             toast.error(response.data.message);
           }
@@ -91,20 +94,28 @@ const Home = () => {
   }, []);
 
   const getEditTask = async (taskId) => {
+    setTaskDetails({
+      _id: "",
+      title: "",
+      description: "",
+      dueDate: "",
+      status: "",
+      priority: "",
+    });
     const token = JSON.parse(localStorage.getItem("Token"));
 
     if (token) {
       try {
-        const response = api.post("/get-edit-task", { token, taskId });
+        const response = await api.post("/get-edit-task", { token, taskId });
+
         if (response.data.success) {
-          // console.log(response?.data?.task, "task here");
+          console.log(response?.data?.task);
           setTaskDetails(response?.data?.task);
-          // toast.success(response?.data?.message);
         } else {
-          toast.error(response?.data?.message);
+          toast.error(response.data.message);
         }
       } catch (error) {
-        console.log(error.response.data.message);
+        toast.error(error.response.data.message);
       }
     }
   };
@@ -113,10 +124,11 @@ const Home = () => {
     onOpen();
     if (taskId) {
       getEditTask(taskId);
+      setUpdateTaskId(taskId);
     }
   };
 
-  const handleUpdateTaskSubmit = async (e, taskId) => {
+  const handleUpdateTaskSubmit = async (e) => {
     e.preventDefault();
 
     const token = JSON.parse(localStorage.getItem("Token"));
@@ -124,7 +136,7 @@ const Home = () => {
     if (token) {
       try {
         const response = await api.post("/update-task", {
-          taskId,
+          taskId: updateTaskId,
           token,
           taskDetails,
         });
@@ -191,15 +203,15 @@ const Home = () => {
                 <TableCell>{task?.title}</TableCell>
                 <TableCell>
                   <Button color="primary" radius="sm" className="text-white">
-                    HIGH
+                    {task?.priority ? task?.priority : "Not Set"}
                   </Button>
                 </TableCell>
                 <TableCell>
                   <Button color="success" radius="sm" className="text-white">
-                    IN PROGRESS
+                    {task?.status ? task?.status : "Not Set"}
                   </Button>
                 </TableCell>
-                <TableCell>5th Jun 2023</TableCell>
+                <TableCell>{task?.dueDate ? task?.dueDate : "---"}</TableCell>
                 <TableCell className="flex items-center justify-evenly">
                   <div onClick={() => handleOpen(task._id)}>
                     <i className="fa-solid fa-pen-to-square fa-xl cursor-pointer"></i>
@@ -220,8 +232,8 @@ const Home = () => {
               <ModalHeader className="flex flex-col gap-1">
                 <h2>Edit Your Todo</h2>
               </ModalHeader>
-              <ModalBody>
-                <form onSubmit={handleUpdateTaskSubmit}>
+              <form onSubmit={handleUpdateTaskSubmit}>
+                <ModalBody>
                   <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
                     <Input
                       size="sm"
@@ -230,7 +242,7 @@ const Home = () => {
                       placeholder="Enter Title"
                       name="title"
                       onChange={handleChangeValues}
-                      value={taskDetails.title}
+                      value={taskDetails?.title}
                     />
                   </div>
                   <div className="w-full mt-5">
@@ -241,7 +253,7 @@ const Home = () => {
                       className="w-full md:col-span-6 mb-6 md:mb-0"
                       name="description"
                       onChange={handleChangeValues}
-                      value={taskDetails.description}
+                      value={taskDetails?.description}
                     />
                   </div>
                   <div className="flex flex-col w-full flex-wrap md:flex-nowrap gap-4 my-1">
@@ -251,7 +263,7 @@ const Home = () => {
                       className="w-4/12"
                       name="dueDate"
                       onChange={handleChangeValues}
-                      value={taskDetails.dueDate}
+                      value={taskDetails?.dueDate}
                     />
                   </div>
                   <div className="flex flex-col gap-3 mt-2">
@@ -260,11 +272,11 @@ const Home = () => {
                       orientation="horizontal"
                       name="priority"
                       onChange={handleChangeValues}
-                      value={taskDetails.priority}
+                      value={taskDetails?.priority}
                     >
-                      <Radio value="buenos-aires">Low</Radio>
-                      <Radio value="sydney">Medium</Radio>
-                      <Radio value="san-francisco">High</Radio>
+                      <Radio value="Low">Low</Radio>
+                      <Radio value="Medium">Medium</Radio>
+                      <Radio value="High">High</Radio>
                     </RadioGroup>
                   </div>
                   <div className="flex flex-col gap-3 mt-2">
@@ -273,33 +285,33 @@ const Home = () => {
                       orientation="horizontal"
                       name="status"
                       onChange={handleChangeValues}
-                      value={taskDetails.status}
+                      value={taskDetails?.status}
                     >
-                      <Radio value="buenos-aires">New</Radio>
-                      <Radio value="sydney">In Progress</Radio>
-                      <Radio value="san-francisco">Completed</Radio>
+                      <Radio value="New">New</Radio>
+                      <Radio value="In Progress">In Progress</Radio>
+                      <Radio value="Completed">Completed</Radio>
                     </RadioGroup>
                   </div>
-                </form>
-              </ModalBody>
-              <ModalFooter>
-                <Button
-                  color="danger"
-                  variant="light"
-                  radius="sm"
-                  onPress={onClose}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  color="primary"
-                  radius="sm"
-                  onPress={onClose}
-                  type="submit"
-                >
-                  Update Todo
-                </Button>
-              </ModalFooter>
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    color="danger"
+                    variant="light"
+                    radius="sm"
+                    onPress={onClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    color="primary"
+                    radius="sm"
+                    onPress={onClose}
+                    type="submit"
+                  >
+                    Update Todo
+                  </Button>
+                </ModalFooter>
+              </form>
             </>
           </ModalContent>
         </Modal>

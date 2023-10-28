@@ -141,7 +141,9 @@ export const getEditTask = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Can't get your task!" });
     }
-    return res.status(200).json({ success: true, message: "Your task title!" });
+    return res
+      .status(200)
+      .json({ success: true, task: task, message: "Your task title!" });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }
