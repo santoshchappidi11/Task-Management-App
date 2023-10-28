@@ -12,10 +12,13 @@ import {
 import { checkIsValidUser } from "./Middlewares/CheckValidUser.js";
 import {
   addTaskTitle,
-  completedTask,
+  completedTasks,
+  deleteCompletedTask,
   deleteTask,
+  deletedTasks,
   getEditTask,
   getYourTasks,
+  permanentDeleteTask,
   updateTask,
 } from "./Controllers/TaskController.js";
 
@@ -36,7 +39,10 @@ app.post("/add-task-title", checkIsValidUser, addTaskTitle);
 app.post("/update-task", checkIsValidUser, updateTask);
 app.post("/get-edit-task", checkIsValidUser, getEditTask);
 app.post("/delete-task", checkIsValidUser, deleteTask);
-app.post("/completed-task", checkIsValidUser, completedTask);
+app.post("/completed-tasks", checkIsValidUser, completedTasks);
+app.post("/deleted-tasks", checkIsValidUser, deletedTasks);
+app.post("/delete-completed-task", checkIsValidUser, deleteCompletedTask);
+app.post("/permanent-delete-task", checkIsValidUser, permanentDeleteTask);
 
 mongoose
   .connect(process.env.MONGO_URL)

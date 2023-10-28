@@ -39,7 +39,7 @@ const Home = () => {
     priority: "",
   });
 
-  console.log(updateTaskId, " update task id here");
+  // console.log(updateTaskId, " update task id here");
 
   const handleInputValue = (e) => {
     setTitle(e.target.value);
@@ -157,13 +157,17 @@ const Home = () => {
     const token = JSON.parse(localStorage.getItem("Token"));
 
     if (token) {
-      const response = await api.post("/delete-task", { token, taskId });
+      try {
+        const response = await api.post("/delete-task", { token, taskId });
 
-      if (response.data.success) {
-        setAllTasks(response.data.tasks);
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
+        if (response.data.success) {
+          setAllTasks(response.data.tasks);
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        console.log(error.response.data.message);
       }
     }
   };
@@ -196,7 +200,7 @@ const Home = () => {
           <TableColumn className="text-center w-2/12">DUE DATE</TableColumn>
           <TableColumn className="text-center">ACTIONS</TableColumn>
         </TableHeader>
-        <TableBody emptyContent={"No rows to display."}>
+        <TableBody emptyContent={"No Tasks to display!"}>
           {allTasks?.length &&
             allTasks?.map((task) => (
               <TableRow key={task._id}>

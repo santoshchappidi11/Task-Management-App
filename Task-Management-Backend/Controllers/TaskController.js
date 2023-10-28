@@ -100,7 +100,19 @@ export const updateTask = async (req, res) => {
     );
 
     if (task) {
-      await task.save();
+      if (status == "Completed") {
+        const user = await UserModel.findById(userId);
+        user?.completedTasks?.push(task);
+        await user.save();
+        const filteredTasks = await TaskModel.findByIdAndDelete(taskId);
+        // await filteredTasks.save();
+        if (filteredTasks) {
+          const tasks = await TaskModel.find({ userId });
+          return res
+            .status(200)
+            .json({ success: true, tasks, message: "Task Updated!" });
+        }
+      }
       const tasks = await TaskModel.find({ userId });
       return res
         .status(200)
@@ -134,7 +146,7 @@ export const getEditTask = async (req, res) => {
     const userId = decodedData.userId;
 
     const task = await TaskModel.findOne({ _id: taskId, userId });
-    console.log(task);
+    // console.log(task);
 
     if (!task) {
       return res
@@ -197,7 +209,59 @@ export const deleteTask = async (req, res) => {
   }
 };
 
-export const completedTask = async (req, res) => {
+export const completedTasks = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decodedData)
+      return res
+        .status(404)
+        .json({ success: false, message: "Token not valid!" });
+
+    const userId = decodedData.userId;
+
+    const user = await UserModel.findById(userId);
+
+    if (user && user?.completedTasks) {
+      return res
+        .status(200)
+        .json({ success: true, tasks: user?.completedTasks });
+    }
+
+    return res.status(404).json({ success: false, message: "No user found!" });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const deletedTasks = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decodedData)
+      return res
+        .status(404)
+        .json({ success: false, message: "Token not valid!" });
+
+    const userId = decodedData.userId;
+
+    const user = await UserModel.findById(userId);
+
+    if (user && user?.deletedTasks) {
+      return res.status(200).json({ success: true, tasks: user?.deletedTasks });
+    }
+
+    return res.status(404).json({ success: false, message: "No user found!" });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const deleteCompletedTask = async (req, res) => {
   try {
     const { taskId, token } = req.body;
 
@@ -215,30 +279,69 @@ export const completedTask = async (req, res) => {
 
     const userId = decodedData.userId;
 
-    const completedTask = await TaskModel.findOneAndDelete({
-      _id: taskId,
-      userId,
-    });
+    const user = await UserModel.findById(userId);
 
-    if (completedTask) {
-      const user = await UserModel.findById(userId);
+    if (user) {
+      const filteredTasks = user?.completedTasks?.filter(
+        (item) => item._id != taskId
+      );
 
-      if (user) {
-        user?.completedTasks?.push(completedTask);
-        await user.save();
-        return res
-          .status(200)
-          .json({ success: true, message: "Task moved to completed List!" });
-      }
+      user.completedTasks = filteredTasks;
+      await user.save();
 
-      return res
-        .status(404)
-        .json({ success: false, message: "No user found!" });
+      const updatedUser = await UserModel.findById(userId);
+
+      return res.status(200).json({
+        success: true,
+        tasks: updatedUser.completedTasks,
+        message: "Task Deleted!",
+      });
     }
 
-    return res
-      .status(404)
-      .json({ success: false, message: "something went wrong! can't delete." });
+    return res.status(404).json({ success: false, message: "No user found!" });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const permanentDeleteTask = async (req, res) => {
+  try {
+    const { taskId, token } = req.body;
+
+    if (!taskId)
+      return res
+        .status(404)
+        .json({ success: false, message: "Task Id is required!" });
+
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decodedData)
+      return res
+        .status(404)
+        .json({ success: false, message: "Token not valid!" });
+
+    const userId = decodedData.userId;
+
+    const user = await UserModel.findById(userId);
+
+    if (user) {
+      const filteredTasks = user?.deletedTasks?.filter(
+        (item) => item._id != taskId
+      );
+
+      user.deletedTasks = filteredTasks;
+      await user.save();
+
+      const updatedUser = await UserModel.findById(userId);
+
+      return res.status(200).json({
+        success: true,
+        tasks: updatedUser.deletedTasks,
+        message: "Task Deleted Permanentely!",
+      });
+    }
+
+    return res.status(404).json({ success: false, message: "No user found!" });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }
