@@ -20,6 +20,8 @@ import {
   getEditTask,
   getYourTasks,
   permanentDeleteTask,
+  revokeAllCompletedTasks,
+  revokeAllDeletedTasks,
   revokeCompletedTask,
   revokeDeletedTask,
   updateTask,
@@ -49,6 +51,12 @@ app.post("/permanent-delete-task", checkIsValidUser, permanentDeleteTask);
 app.post("/revoke-completed-task", checkIsValidUser, revokeCompletedTask);
 app.post("/revoke-deleted-task", checkIsValidUser, revokeDeletedTask);
 app.post("/delete-all-tasks", checkIsValidUser, deleteAllTasks);
+app.post(
+  "/revoke-all-completed-tasks",
+  checkIsValidUser,
+  revokeAllCompletedTasks
+);
+app.post("/revoke-all-deleted-tasks", checkIsValidUser, revokeAllDeletedTasks);
 
 mongoose
   .connect(process.env.MONGO_URL)

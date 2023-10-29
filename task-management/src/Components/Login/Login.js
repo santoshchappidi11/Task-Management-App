@@ -87,6 +87,17 @@ const Login = () => {
             </div>
           </form>
         </div>
+        <div className="mt-5">
+          <p>
+            Don't Have An Account?{" "}
+            <b
+              className="cursor-pointer text-success-500 font-medium"
+              onClick={() => navigateTo("/register")}
+            >
+              Register Here!
+            </b>
+          </p>
+        </div>
       </Card>
     </div>
   );

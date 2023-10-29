@@ -21,11 +21,15 @@ import {
   Radio,
 } from "@nextui-org/react";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../../ApiConfig";
+import { AuthContexts } from "../../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const { state } = useContext(AuthContexts);
+  const navigateTo = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [title, setTitle] = useState();
   const [allTasks, setAllTasks] = useState([]);
@@ -39,7 +43,11 @@ const Home = () => {
     priority: "",
   });
 
-  // console.log(updateTaskId, " update task id here");
+  useEffect(() => {
+    if (!state?.currentUser?.name) {
+      navigateTo("/login");
+    }
+  }, [state, navigateTo]);
 
   const handleInputValue = (e) => {
     setTitle(e.target.value);

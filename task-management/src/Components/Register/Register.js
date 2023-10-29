@@ -102,7 +102,7 @@ const Register = () => {
             />
             <div className="flex flex-wrap gap-4 justify-center items-center">
               <Button
-                className="w-2/12 "
+                className="w-2/1"
                 color="success"
                 variant="ghost"
                 radius="sm"
@@ -112,6 +112,17 @@ const Register = () => {
               </Button>
             </div>
           </form>
+        </div>
+        <div className="mt-5">
+          <p>
+            Already Have An Account?{" "}
+            <b
+              className="cursor-pointer text-danger-500 font-medium"
+              onClick={() => navigateTo("/login")}
+            >
+              Login Here!
+            </b>
+          </p>
         </div>
       </Card>
     </div>

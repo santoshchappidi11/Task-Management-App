@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import {
   Button,
@@ -13,9 +13,19 @@ import {
 } from "@nextui-org/react";
 import api from "../../ApiConfig";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { AuthContexts } from "../../Context/AuthContext";
 
 const DeletedTasks = () => {
+  const { state } = useContext(AuthContexts);
+  const navigateTo = useNavigate();
   const [allTasks, setAllTasks] = useState([]);
+
+  useEffect(() => {
+    if (!state?.currentUser?.name) {
+      navigateTo("/login");
+    }
+  }, [state, navigateTo]);
 
   useEffect(() => {
     const getDeletedTasks = async () => {
@@ -101,6 +111,27 @@ const DeletedTasks = () => {
     }
   };
 
+  const revokeAllTasks = async () => {
+    const token = JSON.parse(localStorage.getItem("Token"));
+
+    if (token) {
+      try {
+        const response = await api.post("/revoke-all-deleted-tasks", {
+          token,
+        });
+
+        if (response.data.success) {
+          setAllTasks([]);
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
+  };
+
   return (
     <>
       <div className="flex justify-center items-center">
@@ -114,6 +145,15 @@ const DeletedTasks = () => {
         className="w-full flex justify-end items-center px-16 pb-5
       "
       >
+        <Button
+          className="text-white mx-5"
+          color="warning"
+          radius="sm"
+          type="submit"
+          onClick={revokeAllTasks}
+        >
+          Revoke All
+        </Button>
         <Button
           color="danger"
           radius="sm"
