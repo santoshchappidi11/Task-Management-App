@@ -42,7 +42,32 @@ const CompletedTasks = () => {
 
     if (token) {
       try {
-        const response = await api.post("/delete-completed-task", { token, taskId });
+        const response = await api.post("/delete-completed-task", {
+          token,
+          taskId,
+        });
+
+        if (response.data.success) {
+          setAllTasks(response.data.tasks);
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
+  };
+
+  const revokeTask = async (taskId) => {
+    const token = JSON.parse(localStorage.getItem("Token"));
+
+    if (token) {
+      try {
+        const response = await api.post("/revoke-completed-task", {
+          token,
+          taskId,
+        });
 
         if (response.data.success) {
           setAllTasks(response.data.tasks);
@@ -90,8 +115,8 @@ const CompletedTasks = () => {
                 </TableCell>
                 <TableCell>{task?.dueDate ? task?.dueDate : "---"}</TableCell>
                 <TableCell className="flex items-center justify-evenly">
-                  <div>
-                    <i class="fa-solid fa-arrow-rotate-left fa-xl"></i>
+                  <div onClick={() => revokeTask(task._id)}>
+                    <i class="fa-solid fa-arrow-rotate-left fa-xl cursor-pointer"></i>
                   </div>
                   <div onClick={() => deleteTask(task._id)}>
                     <i className="fa-solid fa-trash fa-xl cursor-pointer"></i>
