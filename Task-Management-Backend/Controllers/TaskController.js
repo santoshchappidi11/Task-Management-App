@@ -29,8 +29,7 @@ export const getYourTasks = async (req, res) => {
 
 export const addTaskTitle = async (req, res) => {
   try {
-    const { title } = req.body;
-    const { token } = req.body;
+    const { title, token, status, priority } = req.body;
 
     if (!title)
       return res
@@ -51,6 +50,8 @@ export const addTaskTitle = async (req, res) => {
     if (user) {
       const task = new TaskModel({
         title,
+        status,
+        priority,
         userId: user._id,
       });
       await task.save();

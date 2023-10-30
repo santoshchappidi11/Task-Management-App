@@ -17,14 +17,16 @@ const TaskNavbar = () => {
   return (
     <Navbar shouldHideOnScroll className="h-20 w-screen border">
       <NavbarBrand onClick={() => navigateTo("/")}>
-        <h2 className="font-bold text-2xl cursor-pointer">Task Management</h2>
+        <h2 className="font-bold text-2xl cursor-pointer text-purple-700">
+          Task Management
+        </h2>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      <NavbarContent className="hidden sm:flex gap-4 px-8" justify="center">
         <NavbarItem>
           <Link
             color="foreground"
             onClick={() => navigateTo("/")}
-            className="cursor-pointer"
+            className="cursor-pointer font-medium"
           >
             ALL TASKS
           </Link>
@@ -33,7 +35,7 @@ const TaskNavbar = () => {
           <Link
             color="foreground"
             onClick={() => navigateTo("/completed-tasks")}
-            className="cursor-pointer"
+            className="cursor-pointer font-medium"
           >
             COMPLETED TASKS
           </Link>
@@ -42,7 +44,7 @@ const TaskNavbar = () => {
           <Link
             color="foreground"
             onClick={() => navigateTo("/deleted-tasks")}
-            className="cursor-pointer"
+            className="cursor-pointer font-medium"
           >
             DELETED TASKS
           </Link>
@@ -50,7 +52,9 @@ const TaskNavbar = () => {
       </NavbarContent>
       <NavbarContent justify="end">
         {state?.currentUser?.name && (
-          <NavbarItem>Welcome, ({state?.currentUser?.name})</NavbarItem>
+          <NavbarItem className="px-5">
+            Welcome, ({state?.currentUser?.name?.toUpperCase()})
+          </NavbarItem>
         )}
         <NavbarItem className="hidden lg:flex">
           {!state?.currentUser?.name ? (

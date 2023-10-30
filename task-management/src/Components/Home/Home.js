@@ -39,8 +39,8 @@ const Home = () => {
     title: "",
     description: "",
     dueDate: "",
-    status: "",
-    priority: "",
+    status: "Not Set",
+    priority: "Not Set",
   });
 
   useEffect(() => {
@@ -63,9 +63,15 @@ const Home = () => {
     if (token) {
       if (title) {
         try {
-          const response = await api.post("/add-task-title", { token, title });
+          const response = await api.post("/add-task-title", {
+            token,
+            title,
+            status: taskDetails.status,
+            priority: taskDetails.priority,
+          });
           if (response.data.success) {
             setTitle("");
+
             setAllTasks(response.data.tasks);
             toast.success(response.data.message);
           } else {
@@ -150,6 +156,14 @@ const Home = () => {
         });
 
         if (response.data.success) {
+          setTaskDetails({
+            _id: "",
+            title: "",
+            description: "",
+            dueDate: "",
+            status: "Not Set",
+            priority: "Not Set",
+          });
           setAllTasks(response.data.tasks);
           toast.success(response.data.message);
         } else {
@@ -214,12 +228,30 @@ const Home = () => {
               <TableRow key={task._id}>
                 <TableCell>{task?.title}</TableCell>
                 <TableCell>
-                  <Button color="primary" radius="sm" className="text-white">
+                  <Button
+                    color={`${
+                      (task?.priority == "High" && "danger") ||
+                      (task?.priority == "Medium" && "success") ||
+                      (task?.priority == "Low" && "primary") ||
+                      (task?.priority == "Not Set" && "secondary")
+                    }`}
+                    radius="sm"
+                    className="text-white"
+                  >
                     {task?.priority ? task?.priority : "Not Set"}
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Button color="success" radius="sm" className="text-white">
+                  <Button
+                    color={`${
+                      (task?.status == "New" && "warning") ||
+                      (task?.status == "In Progress" && "primary") ||
+                      (task?.status == "Completed" && "success") ||
+                      (task?.status == "Not Set" && "secondary")
+                    }`}
+                    radius="sm"
+                    className="text-white"
+                  >
                     {task?.status ? task?.status : "Not Set"}
                   </Button>
                 </TableCell>

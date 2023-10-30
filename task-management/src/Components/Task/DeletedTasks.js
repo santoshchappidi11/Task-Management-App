@@ -177,12 +177,30 @@ const DeletedTasks = () => {
               <TableRow key={task._id}>
                 <TableCell>{task?.title}</TableCell>
                 <TableCell>
-                  <Button color="primary" radius="sm" className="text-white">
+                  <Button
+                    color={`${
+                      (task?.priority == "High" && "danger") ||
+                      (task?.priority == "Medium" && "success") ||
+                      (task?.priority == "Low" && "primary") ||
+                      (task?.priority == "Not Set" && "secondary")
+                    }`}
+                    radius="sm"
+                    className="text-white"
+                  >
                     {task?.priority ? task?.priority : "Not Set"}
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Button color="success" radius="sm" className="text-white">
+                  <Button
+                    color={`${
+                      (task?.status == "New" && "warning") ||
+                      (task?.status == "In Progress" && "primary") ||
+                      (task?.status == "Completed" && "success") ||
+                      (task?.status == "Not Set" && "secondary")
+                    }`}
+                    radius="sm"
+                    className="text-white"
+                  >
                     {task?.status ? task?.status : "Not Set"}
                   </Button>
                 </TableCell>
