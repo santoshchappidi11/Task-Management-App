@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export const getYourTasks = async (req, res) => {
   try {
-    const { token } = req.body;
+    const { token, priority } = req.body;
 
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -15,7 +15,12 @@ export const getYourTasks = async (req, res) => {
 
     const userId = decodedData.userId;
 
-    const tasks = await TaskModel.find({ userId });
+    const query = {};
+    if (priority) {
+      query.priority = { $regex: priority, $options: "i" };
+    }
+
+    const tasks = await TaskModel.find({ userId }).find(query);
 
     if (tasks?.length) {
       return res.status(200).json({ success: true, tasks });

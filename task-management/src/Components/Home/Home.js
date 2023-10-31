@@ -7,6 +7,10 @@ import {
   TableHeader,
   TableRow,
   TableCell,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 
 import {
@@ -28,6 +32,16 @@ import { AuthContexts } from "../../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const [priorityValue, setPriorityValue] = useState();
+  const [selectedKeys, setSelectedKeys] = React.useState(
+    new Set(["Filter By Priority"])
+  );
+
+  const selectedValue = React.useMemo(
+    () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
+    [selectedKeys]
+  );
+
   const { state } = useContext(AuthContexts);
   const navigateTo = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -88,11 +102,20 @@ const Home = () => {
 
   useEffect(() => {
     const getYourTasks = async () => {
+      if (selectedValue == "All") {
+        setPriorityValue("");
+      } else {
+        setPriorityValue(selectedValue);
+      }
+
       const token = JSON.parse(localStorage.getItem("Token"));
 
       if (token) {
         try {
-          const response = await api.post("/get-your-tasks", { token });
+          const response = await api.post("/get-your-tasks", {
+            token,
+            priority: priorityValue,
+          });
           if (response.data.success) {
             setAllTasks(response?.data?.tasks);
           } else {
@@ -105,7 +128,7 @@ const Home = () => {
     };
 
     getYourTasks();
-  }, []);
+  }, [selectedValue, priorityValue]);
 
   const getEditTask = async (taskId) => {
     setTaskDetails({
@@ -195,7 +218,7 @@ const Home = () => {
   };
 
   return (
-    <div className="">
+    <div>
       <div className="flex w-screen flex-wrap md:flex-nowrap gap-4 justify-center items-center mt-10 mb-8">
         <Input
           type="text"
@@ -213,6 +236,28 @@ const Home = () => {
         >
           ADD TODO
         </Button>
+      </div>
+      <div className="w-full flex justify-end items-center px-16 pb-5">
+        <Dropdown>
+          <DropdownTrigger>
+            <Button variant="bordered" color="danger" className="capitalize">
+              {selectedValue}
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Filter Priority"
+            variant="flat"
+            disallowEmptySelection
+            selectionMode="single"
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+          >
+            <DropdownItem key="All">All</DropdownItem>
+            <DropdownItem key="High">High</DropdownItem>
+            <DropdownItem key="Low">Low</DropdownItem>
+            <DropdownItem key="Medium">Medium</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </div>
       <Table className="w-11/12 mx-auto">
         <TableHeader>
