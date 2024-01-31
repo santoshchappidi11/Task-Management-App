@@ -6,6 +6,9 @@ export const getYourTasks = async (req, res) => {
   try {
     const { token, priority } = req.body;
 
+    // console.log(token, "token");
+    // console.log(priority, "priority");
+
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
     if (!decodedData)
@@ -20,7 +23,11 @@ export const getYourTasks = async (req, res) => {
       query.priority = { $regex: priority, $options: "i" };
     }
 
+    // console.log(query, "query here");
+
     const tasks = await TaskModel.find({ userId }).find(query);
+
+    console.log(tasks, "tasks here");
 
     if (tasks?.length) {
       return res.status(200).json({ success: true, tasks });

@@ -37,6 +37,8 @@ const Home = () => {
     new Set(["Filter By Priority"])
   );
 
+  // console.log(priorityValue, "priority");
+
   const selectedValue = React.useMemo(
     () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
     [selectedKeys]
@@ -57,11 +59,15 @@ const Home = () => {
     priority: "Not Set",
   });
 
-  useEffect(() => {
-    if (!state?.currentUser?.name) {
-      navigateTo("/login");
-    }
-  }, [state, navigateTo]);
+  console.log(allTasks, "tasks here");
+
+  // useEffect(() => {
+  //   if (!state?.currentUser?.name) {
+  //     navigateTo("/login");
+  //   } else {
+  //     navigateTo("");
+  //   }
+  // }, [state, navigateTo]);
 
   const handleInputValue = (e) => {
     setTitle(e.target.value);
@@ -108,6 +114,7 @@ const Home = () => {
         setPriorityValue(selectedValue);
       }
 
+      // setPriorityValue(selectedValue);
       const token = JSON.parse(localStorage.getItem("Token"));
 
       if (token) {
@@ -146,7 +153,7 @@ const Home = () => {
         const response = await api.post("/get-edit-task", { token, taskId });
 
         if (response.data.success) {
-          console.log(response?.data?.task);
+          // console.log(response?.data?.task);
           setTaskDetails(response?.data?.task);
         } else {
           toast.error(response.data.message);

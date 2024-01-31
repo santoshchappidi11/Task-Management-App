@@ -27,6 +27,7 @@ import {
   updateTask,
 } from "./Controllers/TaskController.js";
 
+const PORT = process.env.PORT || 8000;
 const app = express();
 app.use(express.json());
 dotenv.config();
@@ -65,6 +66,6 @@ mongoose
     console.log(error, "something went wrong! can't connect to DB")
   );
 
-app.listen(8000, () => {
-  console.log("Listening on port 8000...");
+app.listen(PORT, () => {
+  console.log(`listening on port ${PORT}...`);
 });
