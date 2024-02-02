@@ -7,8 +7,6 @@ export const getYourTasks = async (req, res) => {
     const { token, priority, sort = "date" } = req.body;
     const { currentKey } = req.body.filterByDate;
 
-    console.log(currentKey, "current");
-
     let filter = "";
 
     if (currentKey === "Old") {
@@ -19,8 +17,6 @@ export const getYourTasks = async (req, res) => {
       filter = "";
     }
 
-    console.log(filter, "filter");
-
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
     if (!decodedData)
@@ -30,19 +26,20 @@ export const getYourTasks = async (req, res) => {
 
     const userId = decodedData.userId;
 
-    // const user = await UserModel.findById(userId);
-
     const query = {};
     if (priority) {
-      query.priority = { $regex: priority, $options: "i" };
+      query.priority = priority;
+      // { $regex: priority, $options: "i" };
     }
 
     const sortField = sort.replace(/^-/, "");
     const sortOption = { [sortField]: `${filter}` };
 
-    const tasks = await TaskModel.find({ userId }).find(query).sort(sortOption);
+    console.log(sortOption, "sort option");
 
-    console.log(tasks, "tasks");
+    const tasks = await TaskModel.find({ userId, ...query }).sort(sortOption);
+
+    // console.log(tasks, "tasks");
     if (tasks && tasks?.length > 0) {
       return res.status(200).json({ success: true, tasks });
     }
