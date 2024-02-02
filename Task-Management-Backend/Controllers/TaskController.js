@@ -35,7 +35,7 @@ export const getYourTasks = async (req, res) => {
     const sortField = sort.replace(/^-/, "");
     const sortOption = { [sortField]: `${filter}` };
 
-    console.log(sortOption, "sort option");
+    // console.log(sortOption, "sort option");
 
     const tasks = await TaskModel.find({ userId, ...query }).sort(sortOption);
 
