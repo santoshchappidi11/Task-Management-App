@@ -4,10 +4,22 @@ import jwt from "jsonwebtoken";
 
 export const getYourTasks = async (req, res) => {
   try {
-    const { token, priority } = req.body;
+    const { token, priority, sort = "date" } = req.body;
+    const { currentKey } = req.body.filterByDate;
 
-    // console.log(token, "token");
-    // console.log(priority, "priority");
+    console.log(currentKey, "current");
+
+    let filter = "";
+
+    if (currentKey === "Old") {
+      filter = "1";
+    } else if (currentKey === "New") {
+      filter = "-1";
+    } else {
+      filter = "";
+    }
+
+    console.log(filter, "filter");
 
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -18,18 +30,20 @@ export const getYourTasks = async (req, res) => {
 
     const userId = decodedData.userId;
 
+    // const user = await UserModel.findById(userId);
+
     const query = {};
     if (priority) {
       query.priority = { $regex: priority, $options: "i" };
     }
 
-    // console.log(query, "query here");
+    const sortField = sort.replace(/^-/, "");
+    const sortOption = { [sortField]: `${filter}` };
 
-    const tasks = await TaskModel.find({ userId }).find(query);
+    const tasks = await TaskModel.find({ userId }).find(query).sort(sortOption);
 
-    console.log(tasks, "tasks here");
-
-    if (tasks?.length) {
+    console.log(tasks, "tasks");
+    if (tasks && tasks?.length > 0) {
       return res.status(200).json({ success: true, tasks });
     }
 

@@ -25,6 +25,11 @@ const taskSchema = new Schema({
     ref: "User",
     required: true,
   },
+  date: {
+    type: Date,
+    default: Date.now,
+    required: true,
+  },
 });
 
 export default mongoose.model("Task", taskSchema);

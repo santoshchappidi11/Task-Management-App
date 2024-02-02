@@ -23,6 +23,8 @@ const reducer = (state, action) => {
 const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  console.log(state?.currentUser?.name, "state here");
+
   const Login = (userData) => {
     dispatch({
       type: "LOGIN",
@@ -39,32 +41,27 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    
-const getCurrentUser = async() => {
-    const token = JSON.parse(localStorage.getItem("Token"));
+    const getCurrentUser = async () => {
+      const token = JSON.parse(localStorage.getItem("Token"));
 
-    if (token) {
-      try {
-        const response = await api.post("/get-current-user", {token})
-if(response.data.success){
-
-     dispatch({
-      type: "LOGIN",
-      payload: response.data.user,
-    });
-    
-}else{
-    toast.error(response.data.message)
-}
-
-      } catch (error) {
-        toast.error(error.response.data.message);
+      if (token) {
+        try {
+          const response = await api.post("/get-current-user", { token });
+          if (response.data.success) {
+            dispatch({
+              type: "LOGIN",
+              payload: response.data.user,
+            });
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          toast.error(error.response.data.message);
+        }
       }
-    }
-}
+    };
 
-getCurrentUser()
-
+    getCurrentUser();
   }, []);
 
   return (

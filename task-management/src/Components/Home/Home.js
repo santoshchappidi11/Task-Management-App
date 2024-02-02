@@ -33,8 +33,10 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [priorityValue, setPriorityValue] = useState();
-  const [selectedKeys, setSelectedKeys] = React.useState(
-    new Set(["Filter By Priority"])
+  const [selectedKeys, setSelectedKeys] = React.useState(new Set(["Priority"]));
+
+  const [selectedDate, setSelectedDate] = React.useState(
+    new Set(["Date Created"])
   );
 
   // console.log(priorityValue, "priority");
@@ -59,15 +61,7 @@ const Home = () => {
     priority: "Not Set",
   });
 
-  console.log(allTasks, "tasks here");
-
-  // useEffect(() => {
-  //   if (!state?.currentUser?.name) {
-  //     navigateTo("/login");
-  //   } else {
-  //     navigateTo("");
-  //   }
-  // }, [state, navigateTo]);
+  // console.log(selectedValue, "selected value");
 
   const handleInputValue = (e) => {
     setTitle(e.target.value);
@@ -91,7 +85,6 @@ const Home = () => {
           });
           if (response.data.success) {
             setTitle("");
-
             setAllTasks(response.data.tasks);
             toast.success(response.data.message);
           } else {
@@ -107,21 +100,23 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const getYourTasks = async () => {
-      if (selectedValue == "All") {
-        setPriorityValue("");
-      } else {
-        setPriorityValue(selectedValue);
-      }
+    if (selectedValue === "All") {
+      setPriorityValue("");
+    } else {
+      setPriorityValue(selectedValue);
+    }
+  }, [selectedValue, priorityValue]);
 
-      // setPriorityValue(selectedValue);
+  useEffect(() => {
+    const getYourTasks = async () => {
       const token = JSON.parse(localStorage.getItem("Token"));
 
       if (token) {
         try {
           const response = await api.post("/get-your-tasks", {
             token,
-            priority: priorityValue,
+            priority: priorityValue ? priorityValue : "",
+            filterByDate: selectedDate ? selectedDate : "",
           });
           if (response.data.success) {
             setAllTasks(response?.data?.tasks);
@@ -135,7 +130,7 @@ const Home = () => {
     };
 
     getYourTasks();
-  }, [selectedValue, priorityValue]);
+  }, [priorityValue, selectedDate]);
 
   const getEditTask = async (taskId) => {
     setTaskDetails({
@@ -244,7 +239,25 @@ const Home = () => {
           ADD TODO
         </Button>
       </div>
-      <div className="w-full flex justify-end items-center px-16 pb-5">
+      <div className="w-full flex justify-evenly items-center px-16 pb-5">
+        <Dropdown>
+          <DropdownTrigger>
+            <Button variant="bordered" color="danger" className="capitalize">
+              {selectedDate}
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Filter Date"
+            variant="flat"
+            disallowEmptySelection
+            selectionMode="single"
+            selectedKeys={selectedDate}
+            onSelectionChange={setSelectedDate}
+          >
+            <DropdownItem key="New">New</DropdownItem>
+            <DropdownItem key="Old">Old</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
         <Dropdown>
           <DropdownTrigger>
             <Button variant="bordered" color="danger" className="capitalize">
@@ -275,7 +288,7 @@ const Home = () => {
           <TableColumn className="text-center">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody emptyContent={"No Tasks to display!"}>
-          {allTasks?.length &&
+          {allTasks?.length > 0 &&
             allTasks?.map((task) => (
               <TableRow key={task._id}>
                 <TableCell>{task?.title}</TableCell>

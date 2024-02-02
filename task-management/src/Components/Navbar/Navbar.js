@@ -9,10 +9,17 @@ import {
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { AuthContexts } from "../../Context/AuthContext";
+import toast from "react-hot-toast";
 
 const TaskNavbar = () => {
   const navigateTo = useNavigate();
   const { state, Logout } = useContext(AuthContexts);
+
+  const handleUserLogout = () => {
+    Logout();
+    navigateTo("/login");
+    toast.success("Logout Successfull!");
+  };
 
   return (
     <Navbar shouldHideOnScroll className="h-20 w-screen border">
@@ -65,7 +72,7 @@ const TaskNavbar = () => {
               Login
             </Link>
           ) : (
-            <Link onClick={Logout} className="cursor-pointer">
+            <Link onClick={() => handleUserLogout()} className="cursor-pointer">
               Logout
             </Link>
           )}
