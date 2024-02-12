@@ -21,11 +21,13 @@ const DeletedTasks = () => {
   const navigateTo = useNavigate();
   const [allTasks, setAllTasks] = useState([]);
 
-  useEffect(() => {
-    if (!state?.currentUser?.name) {
-      navigateTo("/login");
-    }
-  }, [state, navigateTo]);
+  // useEffect(() => {
+  //   if (!state?.currentUser?.name) {
+  //     navigateTo("/login");
+  //   } else {
+  //     navigateTo("/deleted-tasks");
+  //   }
+  // }, [state, navigateTo]);
 
   useEffect(() => {
     const getDeletedTasks = async () => {

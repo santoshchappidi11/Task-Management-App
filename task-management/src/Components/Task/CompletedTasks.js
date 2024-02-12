@@ -20,11 +20,13 @@ const CompletedTasks = () => {
   const navigateTo = useNavigate();
   const [allTasks, setAllTasks] = useState([]);
 
-  useEffect(() => {
-    if (!state?.currentUser?.name) {
-      navigateTo("/login");
-    }
-  }, [state, navigateTo]);
+  // useEffect(() => {
+  //   if (state && !state?.currentUser?.email) {
+  //     navigateTo("/login");
+  //   } else {
+  //     navigateTo("/completed-tasks");
+  //   }
+  // }, [state, navigateTo]);
 
   useEffect(() => {
     const getCompletedTasks = async () => {
